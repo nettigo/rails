@@ -50,16 +50,19 @@ module ActionDispatch
       end
 
       def formats
-        @env["action_dispatch.request.formats"] ||=
-          if parameters[:format]
-            Array(Mime[parameters[:format]])
-          elsif use_accept_header && valid_accept_header
-            accepts
-          elsif xhr?
-            [Mime::JS]
-          else
-            [Mime::HTML]
-          end
+        v =if parameters[:format]
+             Array(Mime[parameters[:format]])
+           elsif use_accept_header && valid_accept_header
+             accepts
+           elsif xhr?
+             [Mime::JS]
+           else
+             [Mime::HTML]
+           end
+
+        @env["action_dispatch.request.formats"] ||= v.select do |format|
+          format.symbol || format.ref == "*/*"
+        end
       end
 
       # Sets the \format by string extension, which can be used to force custom formats
@@ -99,7 +102,7 @@ module ActionDispatch
 
       def valid_accept_header
         (xhr? && (accept.present? || content_mime_type)) ||
-          (accept.present? && accept !~ BROWSER_LIKE_ACCEPTS)
+            (accept.present? && accept !~ BROWSER_LIKE_ACCEPTS)
       end
 
       def use_accept_header
