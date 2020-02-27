@@ -1,6 +1,7 @@
 require 'active_record/connection_adapters/abstract_mysql_adapter'
 
-gem 'mysql2', '~> 0.3.10'
+#use mysql2 gem from
+# gem 'mysql2', '~> 0.3.10'
 require 'mysql2'
 
 module ActiveRecord
